@@ -1,0 +1,42 @@
+name: NeuroCIM软件访问申请
+description: 使用当前GitHub账号申请下载和更新NeuroCIM
+title: "[访问申请] "
+labels: ["access-request", "pending"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请由软件实际使用者本人提交。管理员批准后，系统将邀请本账号加入私有发布仓库。
+  - type: input
+    id: organization
+    attributes:
+      label: 单位或课题组
+      placeholder: 学校、研究所、公司或课题组名称
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 使用目的
+      description: 简要说明研究任务和计划使用的功能。
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 计划使用的版本
+      options:
+        - 自动检测（推荐）
+        - CPU通用版
+        - NVIDIA GPU版
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 使用承诺
+      options:
+        - label: 我不会转发安装包、更新文件或账号凭据。
+          required: true
+        - label: 我会遵守软件及第三方组件许可证。
+          required: true

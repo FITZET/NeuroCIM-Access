@@ -1,0 +1,64 @@
+name: Manage distribution access
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  grant:
+    if: github.event.label.name == 'approved' && contains(github.event.issue.labels.*.name, 'access-request')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.DISTRIBUTION_ADMIN_TOKEN }}
+          script: |
+            const username = context.payload.issue.user.login;
+            await github.rest.repos.addCollaborator({
+              owner: 'FITZET', repo: 'NeuroCIM-Distribution', username, permission: 'pull'
+            });
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const username = context.payload.issue.user.login;
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number, name: 'pending'
+            }).catch(() => {});
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `@${username} 申请已批准。请接受 GitHub 发出的 NeuroCIM-Distribution 私有仓库邀请，然后运行安装引导程序。`
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number, state: 'closed'
+            });
+
+  revoke:
+    if: github.event.label.name == 'revoked' && contains(github.event.issue.labels.*.name, 'access-request')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.DISTRIBUTION_ADMIN_TOKEN }}
+          script: |
+            const username = context.payload.issue.user.login;
+            await github.rest.repos.removeCollaborator({
+              owner: 'FITZET', repo: 'NeuroCIM-Distribution', username
+            });
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const username = context.payload.issue.user.login;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `@${username} 的 NeuroCIM 下载和更新权限已撤销。`
+            });
