@@ -33,7 +33,7 @@ jobs:
             await github.rest.issues.createComment({
               owner: context.repo.owner, repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `@${username} 申请已批准。请接受 GitHub 发出的 NeuroCIM-Distribution 私有仓库邀请，然后运行安装引导程序。`
+              body: `@${username} 申请已批准，只读权限已开通。组织成员可以直接运行安装引导程序；其他用户若收到 GitHub 仓库邀请，请先接受邀请。`
             });
             await github.rest.issues.update({
               owner: context.repo.owner, repo: context.repo.repo,
